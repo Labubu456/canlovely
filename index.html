@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAN ACC (Dark)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .wrapper {
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            width: 450px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            font-size: 22px;
+        }
+        .box {
+            background: #2c2c2c;
+            border: 1px solid #444;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        textarea, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #383838;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        textarea {
+            height: 90px;
+            resize: vertical;
+        }
+        ::placeholder { color: #888; opacity: 1; }
+
+        .info-label {
+            font-weight: bold;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #a5d6a7;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            flex: 1;
+        }
+        .btn-get {
+            background-color: #0d47a1;
+            color: white;
+        }
+        .btn-get:hover {
+            background-color: #1565c0;
+        }
+        .btn-copy {
+            background-color: #1b5e20;
+            color: white;
+        }
+        .btn-copy:hover {
+            background-color: #2e7d32;
+        }
+        #resultOutput {
+            background: #121212;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <h2>CAN ACC</h2>
+
+    <!-- Bagian 1: Daftar Sisa -->
+    <div class="box">
+        <textarea id="sourceInput" placeholder="Masukkan daftar link/data (satu per baris)..."></textarea>
+        <div class="info-label">Tersedia: <span id="countDisplay">0</span></div>
+    </div>
+
+    <!-- Bagian 2: Input Jumlah & Tombol -->
+    <div class="box">
+        <input type="number" id="ambilInput" value="1" min="1" placeholder="Jumlah di ambil">
+        <div class="btn-group">
+            <button class="btn-get" onclick="getProcess()">Get</button>
+            <button class="btn-copy" onclick="copyResult()">Copy</button>
+        </div>
+    </div>
+
+    <!-- Bagian 3: Hasil -->
+    <div class="box" style="margin-bottom: 0;">
+        <div style="font-size: 13px; color: #aaa; margin-bottom: 5px;">Hasil</div>
+        <textarea id="resultOutput" placeholder="Hasil akan muncul di sini..."></textarea>
+    </div>
+</div>
+
+<script>
+    function updateCounter() {
+        const text = document.getElementById('sourceInput').value;
+        if (!text) {
+            document.getElementById('countDisplay').innerText = '0';
+            return;
+        }
+        // Hitung total baris termasuk baris kosong
+        const lines = text.replace(/\r\n/g, '\n').split('\n');
+        document.getElementById('countDisplay').innerText = lines.length;
+    }
+
+    document.getElementById('sourceInput').addEventListener('input', updateCounter);
+
+    function getProcess() {
+        const sourceElem = document.getElementById('sourceInput');
+        const resultElem = document.getElementById('resultOutput');
+        const ambilQty = parseInt(document.getElementById('ambilInput').value) || 1;
+
+        if (!sourceElem.value) {
+            resultElem.value = '';
+            updateCounter();
+            return;
+        }
+
+        // Pisah teks per baris murni tanpa membuang baris kosong
+        const lines = sourceElem.value.replace(/\r\n/g, '\n').split('\n');
+
+        const taken = lines.slice(0, ambilQty);
+        const remaining = lines.slice(ambilQty);
+
+        // Pertahankan enter/baris kosong persis seperti aslinya
+        resultElem.value = taken.join('\n');
+        sourceElem.value = remaining.join('\n');
+        
+        updateCounter();
+    }
+
+    function copyResult() {
+        const res = document.getElementById('resultOutput');
+        if (!res.value) return;
+        
+        res.select();
+        res.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(res.value);
+    }
+
+    updateCounter();
+</script>
+
+</body>
+</html>
